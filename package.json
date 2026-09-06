@@ -1,0 +1,5 @@
+{
+  "name": "grooming-suite",
+  "private": true,
+  "engines": { "node": ">=20" }
+}
