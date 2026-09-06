@@ -3,7 +3,10 @@ dist/
 build/
 .env
 .env.local
+
+#logs
 *.log
+apps/api/logs/
 
 #Prisma
 apps/api/src/generated/
