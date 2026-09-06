@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Sucursal {
+  id        String   @id @default(cuid())
+  nombre    String
+  direccion String?
+  telefono  String?
+  activa    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuarios Usuario[]
+  clientes Cliente[]
+  citas    Cita[]
+
+  @@map("sucursales")
+}
+
+model Rol {
+  id        String   @id @default(cuid())
+  nombre    String   @unique
+  permisos  String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  usuarios Usuario[]
+
+  @@map("roles")
+}
+
+model Usuario {
+  id           String    @id @default(cuid())
+  nombre       String
+  email        String    @unique
+  passwordHash String
+  activo       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  rolId      String
+  rol        Rol       @relation(fields: [rolId], references: [id])
+  sucursalId String?
+  sucursal   Sucursal? @relation(fields: [sucursalId], references: [id])
+
+  clientesRegistrados Cliente[] @relation("ClienteRegistradoPor")
+  citasAsignadas      Cita[]    @relation("CitaAsignadaA")
+
+  @@index([rolId])
+  @@index([sucursalId])
+  @@map("usuarios")
+}
+
+model Cliente {
+  id                 String   @id @default(cuid())
+  nombre             String
+  telefonoPrincipal  String
+  telefonoSecundario String?
+  nit                String?
+  direccion          String?
+  latitud            Float?
+  longitud           Float?
+  recordatoriosCita  Boolean  @default(true)
+  notas              String?
+  activo             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  sucursalId String
+  sucursal   Sucursal @relation(fields: [sucursalId], references: [id])
+
+  registradoPorId String?
+  registradoPor   Usuario? @relation("ClienteRegistradoPor", fields: [registradoPorId], references: [id])
+
+  mascotas Mascota[]
+  citas    Cita[]
+
+  @@index([sucursalId])
+  @@map("clientes")
+}
+
+enum TamanoMascota {
+  PEQUENO
+  MEDIANO
+  GRANDE
+}
+
+model Mascota {
+  id              String         @id @default(cuid())
+  nombre          String
+  especie         String
+  raza            String?
+  tamano          TamanoMascota?
+  fechaNacimiento DateTime?
+  notasMedicas    String?
+  activo          Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  clienteId String
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  citas Cita[]
+
+  @@index([clienteId])
+  @@map("mascotas")
+}
+
+enum Modalidad {
+  LOCAL
+  DOMICILIO
+}
+
+enum EstadoCita {
+  PENDIENTE
+  CONFIRMADA
+  EN_PROCESO
+  COMPLETADA
+  CANCELADA
+}
+
+model Cita {
+  id              String     @id @default(cuid())
+  fechaHoraInicio DateTime
+  duracionMin     Int
+  modalidad       Modalidad  @default(LOCAL)
+  estado          EstadoCita @default(PENDIENTE)
+  notas           String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  sucursalId String
+  sucursal   Sucursal @relation(fields: [sucursalId], references: [id])
+
+  clienteId String
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+
+  mascotaId String
+  mascota   Mascota @relation(fields: [mascotaId], references: [id])
+
+  asignadoAId String?
+  asignadoA   Usuario? @relation("CitaAsignadaA", fields: [asignadoAId], references: [id])
+
+  @@index([sucursalId, fechaHoraInicio])
+  @@index([clienteId])
+  @@index([mascotaId])
+  @@map("citas")
+}
