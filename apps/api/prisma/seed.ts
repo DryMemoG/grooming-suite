@@ -1,5 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma';
+import { hashPassword } from '../src/modules/auth/password.js';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -40,14 +41,13 @@ async function main() {
 
   await prisma.usuario.upsert({
     where: { email: "admin@grooming-suite.local" },
-    update: {},
+    update: {
+      passwordHash: await hashPassword('Warhammer'),
+    },
     create: {
       nombre: "Admin",
       email: "admin@grooming-suite.local",
-      // Placeholder: cuando armemos el módulo de auth, esto se reemplaza
-      // por un hash real (bcrypt/argon2) generado al crear el usuario.
-      passwordHash:
-        "$2a$12$DFpfQOlxDBr03GyqteNBp.OqINQsH/KrIie7FTiGFZJi/j0jFfHRC", // Hash de Ejemplo: 'Warhammer'
+      passwordHash: await hashPassword("Warhammer"), // Hash de Ejemplo: 'Warhammer'
       rolId: rolAdmin.id,
       sucursalId: sucursal.id,
     },

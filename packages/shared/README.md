@@ -30,6 +30,11 @@ y `apps/mobile`.
 
 `Sucursal`, `Rol`, `Usuario`, `Cliente`, `Mascota`, `Cita`.
 
+## Schemas auxiliares
+
+`LoginSchema` (`auth.schema.ts`) — no corresponde a una tabla, es el
+contrato de entrada del endpoint `POST /auth/login`.
+
 ## Uso
 
 ```ts

@@ -51,6 +51,7 @@ model Usuario {
 
   clientesRegistrados Cliente[] @relation("ClienteRegistradoPor")
   citasAsignadas      Cita[]    @relation("CitaAsignadaA")
+  refreshTokens RefreshToken[]
 
   @@index([rolId])
   @@index([sucursalId])
@@ -151,4 +152,18 @@ model Cita {
   @@index([clienteId])
   @@index([mascotaId])
   @@map("citas")
+}
+
+model RefreshToken {
+  id         String    @id @default(cuid())
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId])
+  @@map("refresh_tokens")
 }

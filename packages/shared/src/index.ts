@@ -5,3 +5,4 @@ export * from './schemas/usuario.schema.js';
 export * from './schemas/cliente.schema.js';
 export * from './schemas/mascota.schema.js';
 export * from './schemas/cita.schema.js';
+export * from './schemas/auth.schema.js';
